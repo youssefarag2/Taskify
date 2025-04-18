@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv'
 import userRoutes from './routes/userRoutes'
+import { authenticate } from './middleware/authMiddleware';
 
 dotenv.config()
 
@@ -14,7 +15,7 @@ app.use('/api/users', userRoutes)
 
 
 
-app.get('/', (req, res)=>{
+app.get('/', authenticate, (req, res)=>{
     res.send("Task Manager API is Running")
 })
 

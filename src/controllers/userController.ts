@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import prisma from "../config/prisma";
 import bcrypt from 'bcrypt';
+import { generateToken } from '../utils/jwt'
 
 const userController = {
     registerUser: async (req: Request, res: Response) => {
@@ -46,8 +47,9 @@ const userController = {
                 res.status(401).json({ success: false, message: "Incorrect password" });
                 return
             }
-    
-            res.status(200).json({ success: true, message: "Login successful" });
+            
+            const token = generateToken(user.id, user.email);
+            res.status(200).json({ success: true, message: "Login successful", token });
             return
         }catch(error){
             console.error("Login Error:", error);
