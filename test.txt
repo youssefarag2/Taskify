@@ -1,1 +1,132 @@
-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1NTE1NDE1Yi03NGU3LTQzMTMtYTcyMC1hOGM3OTFhMGNlNzAiLCJlbWFpbCI6InlvdXNzZWZAZ21haWwuY29tIiwiaWF0IjoxNzQ0OTg1NTMyLCJleHAiOjE3NDUwNzE5MzJ9.TjcceDkvCb-NUTqmEeNtOVxjlZqaEi9YxC_4q1HcxJ0
+Great! Let's build out the task routes and controllers. Since you already have authentication middleware, we’ll secure the routes so that only authenticated users can access them.
+
+Here's a simple plan for the **Tasks** feature:
+
+---
+
+### ✅ Task Model (Prisma Schema)
+Before anything, let’s define the Task model in `prisma/schema.prisma` if you haven’t already:
+
+```prisma
+model Task {
+  id        String   @id @default(uuid())
+  title     String
+  description String?
+  completed Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+}
+```
+
+Then run:
+```bash
+npx prisma migrate dev --name add-task-model
+```
+
+---
+
+### 🧠 Task Controller: `src/controllers/taskController.ts`
+
+```ts
+import { Request, Response } from "express";
+import prisma from "../config/prisma";
+
+const taskController = {
+  getTasks: async (req: Request, res: Response) => {
+    try {
+      const tasks = await prisma.task.findMany({
+        where: { userId: req.user!.userId }
+      });
+      res.status(200).json({ success: true, data: tasks });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ success: false, message: "Server error" });
+    }
+  },
+
+  createTask: async (req: Request, res: Response) => {
+    const { title, description } = req.body;
+    try {
+      const newTask = await prisma.task.create({
+        data: {
+          title,
+          description,
+          userId: req.user!.userId
+        }
+      });
+      res.status(201).json({ success: true, data: newTask });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ success: false, message: "Server error" });
+    }
+  },
+
+  updateTask: async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { title, description, completed } = req.body;
+    try {
+      const updatedTask = await prisma.task.updateMany({
+        where: { id, userId: req.user!.userId },
+        data: { title, description, completed }
+      });
+      res.status(200).json({ success: true, data: updatedTask });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ success: false, message: "Server error" });
+    }
+  },
+
+  deleteTask: async (req: Request, res: Response) => {
+    const { id } = req.params;
+    try {
+      await prisma.task.deleteMany({
+        where: { id, userId: req.user!.userId }
+      });
+      res.status(200).json({ success: true, message: "Task deleted" });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ success: false, message: "Server error" });
+    }
+  }
+};
+
+export default taskController;
+```
+
+---
+
+### 🛣️ Task Routes: `src/routes/taskRoutes.ts`
+
+```ts
+import express from "express";
+import taskController from "../controllers/taskController";
+import { authenticate } from "../middleware/authenticate";
+
+const router = express.Router();
+
+router.use(authenticate); // protect all task routes
+
+router.get("/", taskController.getTasks);
+router.post("/", taskController.createTask);
+router.put("/:id", taskController.updateTask);
+router.delete("/:id", taskController.deleteTask);
+
+export default router;
+```
+
+---
+
+### 📌 Add to Main Server (`src/server.ts` or `src/app.ts`)
+```ts
+import taskRoutes from "./routes/taskRoutes";
+
+// ...
+app.use("/api/tasks", taskRoutes);
+```
+
+---
+
+Want to add subtasks or due dates next? Or maybe filters like "completed only"?
