@@ -1,10 +1,12 @@
 import './App.css'
 import { Routes, Route } from 'react-router-dom';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
 
 function App() {
   return (<Routes>
-    <Route path='/login' element= {<h1>Login page placeholder</h1>}/>
-    <Route path="/register" element={<h1>Register Page Placeholder</h1>} />
+    <Route path='/login' element= {<LoginPage/>}/>
+    <Route path="/register" element={<RegisterPage/>} />
   </Routes>)
 }
 
