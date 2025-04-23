@@ -58,7 +58,7 @@ function LoginPage() {
       }
     } catch (err: any) {
       console.error("Login failed:", err);
-      setError(err.message || "Failed to login. Please try again.");
+      setError(err.message || "Failed to login. Please try again. ");
     } finally {
       setIsLoading(false);
     }
