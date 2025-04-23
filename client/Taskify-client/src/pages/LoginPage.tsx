@@ -1,14 +1,67 @@
-import React from "react";
+import { response } from "express";
+import React, { useEffect } from "react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassowrd] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const { login, isAuthenticated } = useAuth();
 
-  const handleLoginSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  useEffect(() => {
+    // If the user is already authenticated (token exists and is recognized by AuthContext),
+    // redirect them away from the login page to the dashboard.
+    if (isAuthenticated) {
+      console.log("User already authenticated, redirecting to dashboard...");
+      navigate("/dashboard", { replace: true }); // Use replace: true
+    }
+  }, [isAuthenticated, navigate]); // Dependency array
+
+  const handleLoginSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Login attempt with: ", { email, password });
-    // --- TODO: Add API call logic here later ---
+    setIsLoading(true);
+    setError(null); // Clear previous errors
+
+    // Prevent login attempt if already authenticated (optional, belt-and-suspenders)
+    if (isAuthenticated) {
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/users/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(
+          data.message || `HTTP error! status: ${response.status}`
+        );
+      }
+
+      if (data.token) {
+        login(data.token);
+        navigate("/dashboard");
+      } else {
+        setError("Login successful, but no token received.");
+        setIsLoading(false);
+        return;
+      }
+    } catch (err: any) {
+      console.error("Login failed:", err);
+      setError(err.message || "Failed to login. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -50,6 +103,10 @@ function LoginPage() {
           </p>
         </div>
 
+        {error && (
+          <p className="text-center text-sm text-red-600 mb-4">{error}</p>
+        )}
+
         <form className="space-y-6" onSubmit={handleLoginSubmit}>
           <div>
             <label htmlFor="email" className="sr-only">
@@ -88,9 +145,10 @@ function LoginPage() {
           <div>
             <button
               type="submit"
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isLoading}
             >
-              Login
+              {isLoading ? "Logging in..." : "Login"}
             </button>
           </div>
         </form>
