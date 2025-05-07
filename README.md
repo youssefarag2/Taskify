@@ -90,9 +90,9 @@ Install dependencies:
 ```bash
 npm install
 ```
-##Running the Application  
+## Running the Application  
 
-in the roo directory run:
+in the root directory run:
 ```bash
 npm run dev
 ```
