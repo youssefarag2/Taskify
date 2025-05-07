@@ -62,7 +62,7 @@ Follow these steps to get the project up and running on your local machine:
    git clone <your-repo-url>
    cd Taskify
   ```
-**2. Backend Setup:**  
+**2. Backend Setup:**    
   Install dependencies:
   ```bash
   npm install
