@@ -74,3 +74,20 @@ DATABASE_URL="postgresql://YOUR_DB_USER:YOUR_DB_PASSWORD@YOUR_DB_HOST:YOUR_DB_PO
 JWT_SECRET="YOUR_VERY_SECRET_JWT_KEY_SHOULD_BE_LONG_AND_RANDOM"
 PORT=8000 # Or any port you prefer for the backend
 ```
+Apply database migrations to set up the schema:
+```bash
+npx prisma migrate dev
+```
+
+**3. Frontend Setup**  
+
+Navigate to the frontend directory
+```bash
+cd ../client/Taskify-client
+```
+
+Install dependencies:
+```bash
+npm install
+```
+
