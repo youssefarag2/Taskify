@@ -62,8 +62,14 @@ Follow these steps to get the project up and running on your local machine:
    git clone <your-repo-url>
    cd Taskify
   ```
-**2. Backend Setup
+**2. Backend Setup**
   Install dependencies:
   ```bash
   npm install
   ```
+Create a `.env` file in the backend directory. You can copy .env.example if one exists, or create a new one. Add the following environment variables, replacing the placeholder values with your actual credentials and settings:
+```bash
+DATABASE_URL="postgresql://YOUR_DB_USER:YOUR_DB_PASSWORD@YOUR_DB_HOST:YOUR_DB_PORT/YOUR_DB_NAME?schema=public"
+JWT_SECRET="YOUR_VERY_SECRET_JWT_KEY_SHOULD_BE_LONG_AND_RANDOM"
+PORT=8000 # Or any port you prefer for the backend
+```
