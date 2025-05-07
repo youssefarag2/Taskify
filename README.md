@@ -90,4 +90,15 @@ Install dependencies:
 ```bash
 npm install
 ```
+##Running the Application  
+
+in the roo directory run:
+```bash
+npm run dev
+```
+then,
+```bash
+cd client/Taskify-client
+npm run dev
+```
 
