@@ -132,5 +132,3 @@ app.use("/api/tasks", taskRoutes);
 Want to add subtasks or due dates next? Or maybe filters like "completed only"?
 
 
-JWT_SECRET=zkjf9832sdfasLJKH!@#32sfkd9034sdkfjsadk
-JWT_EXPIRES_IN='1d'
